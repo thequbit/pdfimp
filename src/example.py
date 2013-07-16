@@ -17,7 +17,7 @@ def main():
 
     imp = pdfimp()
 
-    links = imp.getlinks(level,maxlevel,filesize,siteurl,urls,True)
+    links = imp.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=urls)
 
     end_time = time.time()
 
