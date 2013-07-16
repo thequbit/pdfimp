@@ -3,21 +3,12 @@ import time
 from pdfimp import pdfimp
 
 def main():
-
-    level = 0
-    maxlevel = 1
-    filesize = 1024
-
-    siteurl = "http://www.scottsvilleny.org/"
-    #success,linktype = typelink(siteurl,filesize)
-    urls = []
-    urls.append(siteurl)
-
+    
     start_time = time.time()
 
+    siteurl = "http://www.scottsvilleny.org/"
     imp = pdfimp()
-
-    links = imp.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=urls)
+    links = imp.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=[siteurl])
 
     end_time = time.time()
 
