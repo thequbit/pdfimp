@@ -48,7 +48,7 @@ class pdfimp:
             success = False;
         return success,filetype
     
-    def getlinks(self,level,maxlevel,filesize,siteurl,links,verbose):
+    def getpdfs(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
         retlinks = []
         if( level >= maxlevel ):
             self._report("[INFO   ] Max depth reached.")
@@ -68,7 +68,7 @@ class pdfimp:
                     if( match == True ): #and ( (level != maxlevel) or (level == maxlevel and (not pagelink in retlinks) ) ) ):
                         thelinks.append(pagelink)
                 
-                gotlinks = self.getlinks(level,maxlevel,filesize,siteurl,thelinks,verbose)
+                gotlinks = self.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=thelinks,level=level,filesize=filesize,verbose=verbose)
                 for gotlink in gotlinks:
                     if not any(gotlink in r for r in retlinks):
                         success,linktype = self._typelink(gotlink,filesize)
