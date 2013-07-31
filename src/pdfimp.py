@@ -1,4 +1,4 @@
-
+import re
 import time
 import magic
 import urllib
@@ -12,6 +12,9 @@ class pdfimp:
 
     def __init__(self):
         self._verbose = True
+
+    def _nonascii(self,s):
+        return "".join(i for i in s if ord(i)<128)
 
     def _report(self,text):
         if self._verbose == True:
@@ -29,7 +32,7 @@ class pdfimp:
             atags = soup.find_all('a', href=True)
             for tag in atags:
                 if len(tag.contents) >= 1:
-                    linktext = tag.contents[0]
+                    linktext = unicode(tag.string).strip()
                 else:
                     linktext = ""
                 siteurlmatch = True
