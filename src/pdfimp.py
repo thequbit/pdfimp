@@ -79,11 +79,11 @@ class pdfimp:
                 
                 gotlinks = self.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=thelinks,level=level,filesize=filesize,verbose=verbose)
                 for _gotlink in gotlinks:
-                    _linktype,gotlink,linktext = _gotlink
+                    gotlink,linktext = _gotlink
                     if not any(gotlink in r for r in retlinks):
                         success,linktype = self._typelink(gotlink,filesize)
                         if success == True and linktype == 'application/pdf':
-                            retlinks.append((linktype,gotlink,linktext))
+                            retlinks.append((gotlink,linktext))
                             self._report("Added '{0}'".format(gotlink))
                         else:
                             ignored += 1
@@ -93,7 +93,7 @@ class pdfimp:
                    if not any(thelink in r for r in retlinks):
                         success,linktype = self._typelink(thelink,filesize)
                         if success == True and linktype == 'application/pdf':
-                            retlinks.append((linktype,thelink,linktext))
+                            retlinks.append((thelink,linktext))
                             self._report("Added '{0}'".format(thelink))
                         else:
                             ignored += 1
