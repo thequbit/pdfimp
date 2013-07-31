@@ -15,27 +15,35 @@ class pdfimp:
 
     def _report(self,text):
         if self._verbose == True:
-            print text
+            print "[INFO   ] {0}".format(text)
     
     def _getpagelinks(self,siteurl,url):
-        links = []
-        try:
+            links = []
+            _sucess,linktype = self._typelink(url,1024)
+            if linktype != "text/html":
+               self._report("Ignoring on-html URL.")
+               return links
+        #try:
             html = urllib2.urlopen(url)
             soup = BeautifulSoup(html)
             atags = soup.find_all('a', href=True)
             for tag in atags:
+                if len(tag.contents) >= 1:
+                    linktext = tag.contents[0]
+                else:
+                    linktext = ""
                 siteurlmatch = True
                 if ( (len(tag['href']) >= 7 and tag['href'][0:7].lower() == "http://") or
                      (len(tag['href']) >= 8 and tag['href'][0:8].lower() == "https://") or
                      (len(tag['href']) >= 3 and tag['href'][0:6].lower() == "ftp://") ):
                     if(url[:url.find("/",7)+1] != siteurl):
                         siteurlmatch = False
-                    links.append((siteurlmatch,tag['href']))
+                    links.append((siteurlmatch,tag['href'],linktext))
                 else:
-                    links.append((siteurlmatch,siteurl + tag['href']))
-        except:
-            links = []
-        return links
+                    links.append((siteurlmatch,siteurl + tag['href'],linktext))
+        #except:
+        #    links = []
+            return links
     
     def _typelink(self,link,filesize):
         req = urllib2.Request(link, headers={'Range':"byte=0-{0}".format(filesize)})
@@ -51,39 +59,42 @@ class pdfimp:
     def getpdfs(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
         retlinks = []
         if( level >= maxlevel ):
-            self._report("[INFO   ] Max depth reached.")
+            self._report("Max depth reached.")
         else:
             level += 1
-            for link in links:
-    
+            for _link in links:
+                link,linktext = _link
+
                 ignored = 0            
     
-                self._report("[INFO   ] Getting links for '{0}'".format(link))
+                self._report("Getting links for '{0}'".format(link))
                 pagelinks = self._getpagelinks(siteurl,link)
-                self._report("[INFO   ] Found {0} links ...".format(len(pagelinks)))
+                self._report("Found {0} links ...".format(len(pagelinks)))
                 
                 thelinks = []
                 for _pagelink in pagelinks:
-                    match,pagelink = _pagelink
+                    match,pagelink,linktext = _pagelink
                     if( match == True ): #and ( (level != maxlevel) or (level == maxlevel and (not pagelink in retlinks) ) ) ):
-                        thelinks.append(pagelink)
+                        thelinks.append((pagelink,linktext))
                 
                 gotlinks = self.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=thelinks,level=level,filesize=filesize,verbose=verbose)
-                for gotlink in gotlinks:
+                for _gotlink in gotlinks:
+                    _linktype,gotlink,linktext = _gotlink
                     if not any(gotlink in r for r in retlinks):
                         success,linktype = self._typelink(gotlink,filesize)
                         if success == True and linktype == 'application/pdf':
-                            retlinks.append((linktype,gotlink))
-                            self._report("[INFO   ] Added '{0}'".format(gotlink))
+                            retlinks.append((linktype,gotlink,linktext))
+                            self._report("Added '{0}'".format(gotlink))
                         else:
                             ignored += 1
     
-                for thelink in thelinks:
-                    if not any(thelink in r for r in retlinks):
+                for _thelink in thelinks:
+                   thelink,linktext = _thelink 
+                   if not any(thelink in r for r in retlinks):
                         success,linktype = self._typelink(thelink,filesize)
                         if success == True and linktype == 'application/pdf':
-                            retlinks.append((linktype,thelink))
-                            self._report("[INFO   ] Added '{0}'".format(thelink))
+                            retlinks.append((linktype,thelink,linktext))
+                            self._report("Added '{0}'".format(thelink))
                         else:
                             ignored += 1
     
