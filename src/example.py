@@ -1,5 +1,5 @@
 import time
-
+from pprint import pprint
 from pdfimp import pdfimp
 
 def main():
@@ -7,10 +7,13 @@ def main():
     start_time = time.time()
 
     siteurl = "http://www.scottsvilleny.org/"
+    maxlevel = 1
     imp = pdfimp()
-    links = imp.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=[siteurl])
+    links = imp.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=[(siteurl,"")])
 
     end_time = time.time()
+
+    pprint(links)
 
     print ""
     print "---- STATS ----"
