@@ -11,6 +11,7 @@ class pdfimp:
     _verbose = False
 
     _processed = []
+    _pdfs = []
 
     def __init__(self):
         self._verbose = True
@@ -65,7 +66,7 @@ class pdfimp:
             success = False;
         return success,filetype
     
-    def getpdfs(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
+    def _followlinks(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
         retlinks = []
         if( level >= maxlevel ):
             self._report("Max depth reached.")
@@ -95,15 +96,16 @@ class pdfimp:
                     if level >= maxlevel:
                         self._processed.append(l)
                 
-                gotlinks = self.getpdfs(maxlevel=maxlevel,siteurl=siteurl,links=thelinks,level=level,filesize=filesize,verbose=verbose)
+                gotlinks = self._followlinks(maxlevel=maxlevel,siteurl=siteurl,links=thelinks,level=level,filesize=filesize,verbose=verbose)
                 for _gotlink in gotlinks:
                     gotlink,linktext = _gotlink
                     if not any(gotlink in r for r in retlinks):
                         success,linktype = self._typelink(gotlink,filesize)
                         if success == True and linktype == 'application/pdf' and not gotlink in self._processed:
-                            retlinks.append((gotlink,linktext))
+                            #retlinks.append((gotlink,linktext))
+                            self._pdfs.append((gotlink,linktext))
                             self._processed.append(gotlink)
-                            self._report("Added '{0}'".format(gotlink))
+                            self._report("L = {0}, C = {1}, Added '{2}'".format(level,len(retlinks),gotlink))
                         else:
                             ignored += 1
     
@@ -112,9 +114,11 @@ class pdfimp:
                    if not any(thelink in r for r in retlinks):
                         success,linktype = self._typelink(thelink,filesize)
                         if success == True and linktype == 'application/pdf' and not thelink in self._processed:
+                            self._pdfs.append((thelink,linktext))
                             retlinks.append((thelink,linktext))
                             self._processed.append(thelink)
-                            self._report("Added '{0}'".format(thelink))
+                            #self._report("Added '{0}'".format(thelink))
+                            self._report("L = {0}, C = {1}, Added '{2}'".format(level,len(retlinks),thelink))
                         else:
                             ignored += 1
     
@@ -125,3 +129,6 @@ class pdfimp:
             self._processed.append(l)
         return retlinks
 
+    def getpdfs(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
+        self._followlinks(maxlevel,siteurl,links,level=0,filesize=1024,verbose=False)
+        return self._pdfs
