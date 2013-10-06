@@ -16,6 +16,10 @@ class pdfimp:
     def __init__(self,verbose):
         self._verbose = verbose
 
+    def _cleanup(self):
+        _processed = []
+        _pdfs = []
+
     def _nonascii(self,s):
         return "".join(i for i in s if ord(i)<128)
 
@@ -145,4 +149,6 @@ class pdfimp:
 
     def getpdfs(self,maxlevel,siteurl,links,level=0,filesize=1024,verbose=False):
         self._followlinks(maxlevel,siteurl,links,level=0,filesize=1024,verbose=False)
-        return self._pdfs
+        pdfs = self._pdfs
+        self._cleanup()
+        return pdfs
