@@ -16,9 +16,12 @@ class pdfimp:
     def __init__(self,verbose):
         self._verbose = verbose
 
+        self._processed = []
+        self._pdfs = []
+
     def _cleanup(self):
-        _processed = []
-        _pdfs = []
+        self._processed = []
+        self._pdfs = []
 
     def _nonascii(self,s):
         return "".join(i for i in s if ord(i)<128)
